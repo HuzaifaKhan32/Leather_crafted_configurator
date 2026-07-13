@@ -1,0 +1,8 @@
+/* src/App.css */
+/* Purane styles hata dein aur sirf ye basic setup rakhein */
+body, html {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: sans-serif;
+}
