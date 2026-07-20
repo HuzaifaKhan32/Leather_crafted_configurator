@@ -5,11 +5,12 @@ import MainPanel from './components/MainPanel.jsx';
 import ScreenshotButton from './components/ScreenshotButton';
 import Logo from './components/Logo.jsx';
 
+
 export default function App() {
   const [activeTab, setActiveTab] = useState(null);
 
   return (
-    <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden', background: '#f5f5f5' }}>
+    <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden', background: '#92cae4' }}>
       <Logo />
       
       {/* 3D Scene */}

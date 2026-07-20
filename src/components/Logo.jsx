@@ -1,7 +1,7 @@
 export default function Logo() {
   return (
     <img 
-      src="/models/logo.png" // Apni image ka path yahan dein
+      src="/model/logo.png" // Apni image ka path yahan dein
       alt="LeatherCrafted"
       style={{
         position: 'absolute',

@@ -23,7 +23,7 @@ export default function ScreenshotButton() {
 
   return (
     <button className="pb-ai-button" onClick={handleScreenshot}>
-      <img src="/models/screenshoot.png" alt="Screenshot" style={{ width: '20px', marginRight: '8px' }} />
+      <img src="/model/screenshoot.png" alt="Screenshot" style={{ width: '20px', marginRight: '8px' }} />
       <span>Screenshot</span>
       <span className="pb-ai-sparkle">✦</span>
     </button>
