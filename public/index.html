@@ -3,21 +3,25 @@
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+    <!-- 💡 Fixed Viewport Meta Tag for Mobile Safe Area & Address Bar Fix -->
+    <meta 
+      name="viewport" 
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" 
+    />
+    
     <meta name="theme-color" content="#000000" />
     <meta
       name="description"
-      content="Web site created using create-react-app"
+      content="LeatherCrafted 3D Product Configurator"
     />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-   
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     
-    <title>Configurator</title>
+    <title>LeatherCrafted Configurator</title>
   </head>
-  <body>
-    <noscript></noscript>
+  <body style="margin: 0; padding: 0; overflow: hidden; touch-action: manipulation;">
+    <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    
   </body>
 </html>

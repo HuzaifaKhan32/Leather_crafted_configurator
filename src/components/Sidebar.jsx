@@ -1,65 +1,102 @@
 import React from 'react';
 
 export default function Sidebar({ setActiveTab, activeTab }) {
-  
-  const sidebarStyles = {
-    position: 'absolute',
-    left: '10px',
-    top: '70px',
-    width: '70px',
-    height: '250px',
-    backdropFilter: 'blur(20px)',
-    // background: '#d3cdca',
-     background: 'rgba(150, 145, 145, 0.6)', 
-    borderRadius: '70px',
-    padding: '30px 10px',
-   border: "1px solid rgba(255, 255, 255, 1)",
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '40px',
-    zIndex: 100
-  };
-
-  const iconContainerStyle = (tabName) => ({
-    width: '60px',
-    height: '60px',
-    top: '30px',
-    background: activeTab === tabName ? '#faf0ed' : '#ffffff',
-    borderRadius: '50%',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    cursor: 'pointer',
-    boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
-    transition: 'all 0.3s ease'
-  });
-
-  const labelStyle = {
-    color: '#333',
-    fontSize: '10px',
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
-    marginTop: '5px'
-  };
-
   return (
-    <div style={sidebarStyles}>
+    <div className="custom-sidebar">
       {/* Design Tab */}
-      <div style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => setActiveTab(activeTab === 'Design' ? null : 'Design')}>
-        <div style={iconContainerStyle('Design')}>
-          <img src="/model/jacket.png" alt="Design" style={{ width: '33px' }} />
+      <div className="tab-item" onClick={() => setActiveTab(activeTab === 'Design' ? null : 'Design')}>
+        <div className={`icon-wrapper ${activeTab === 'Design' ? 'active' : ''}`}>
+          <img src="/model/jacket(1).png" alt="Design" style={{ width: '28px' }} />
         </div>
-        <p style={labelStyle}>Design</p>
+        <p className="tab-label">Design</p>
       </div>
 
       {/* Color Tab */}
-      <div style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => setActiveTab(activeTab === 'Color' ? null : 'Color')}>
-        <div style={iconContainerStyle('Color')}>
-          <img src="/model/color.png" alt="Color" style={{ width: '40px' }} />
+      <div className="tab-item" onClick={() => setActiveTab(activeTab === 'Color' ? null : 'Color')}>
+        <div className={`icon-wrapper ${activeTab === 'Color' ? 'active' : ''}`}>
+          <img src="/model/color-palette.png" alt="Color" style={{ width: '32px' }} />
         </div>
-        <p style={labelStyle}>Color</p>
+        <p className="tab-label">Color</p>
       </div>
+
+      <style>{`
+        .custom-sidebar {
+          position: absolute;
+          left: 10px;
+          top: 320px;
+          width: 60px;
+          height: 170px;
+          backdrop-filter: blur(20px);
+          background: rgba(150, 145, 145, 0.6);
+          border-radius: 70px;
+          padding: 30px 10px;
+          border: 1px solid rgba(255, 255, 255, 1);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 20px;
+          z-index: 100;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        .tab-item {
+          text-align: center;
+          cursor: pointer;
+        }
+
+        .icon-wrapper {
+          width: 55px;
+          height: 55px;
+          background: #ffffff;
+          border-radius: 50%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+          transition: all 0.3s ease;
+        }
+
+        .icon-wrapper.active {
+          background: #faf0ed;
+          transform: scale(1.05);
+        }
+
+        .tab-label {
+          color: #fff;
+          font-size: 10px;
+          font-weight: bold;
+          text-transform: uppercase;
+          margin-top: 5px;
+        }
+
+        @media (max-width: 1024px) {
+          .custom-sidebar {
+            left: 50%;
+            top: auto;
+            bottom: calc(20px + env(safe-area-inset-bottom));
+            transform: translateX(-50%);
+            width: 140px;
+            height: 48px;
+            border-radius: 40px;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
+            padding: 5px 15px;
+            gap: 0;
+            z-index: 1001;
+            position: fixed;
+          }
+
+          .icon-wrapper {
+            width: 38px;
+            height: 38px;
+          }
+
+          .tab-label {
+            display: none;
+          }
+        }
+      `}</style>
     </div>
   );
 }

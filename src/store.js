@@ -1,48 +1,124 @@
 import { proxy } from 'valtio';
 
 export const state = proxy({
-  currentModel: '/model/leather_coat_3d_model.glb', 
-  currentTexture: '/textures/Leathers _ OLD ENGLISH Collection.jfif', 
-  currentShearlingTexture: '/textures/shearling1.jfif', 
-  
-  // ✅ modelsSettings ab proxy ke andar hai aur inke default colors match kar diye gaye hain
-  modelsSettings: {
-    '/model/leather_coat_3d_model.glb': { body: '#2c1914', zip: '#C0C0C0', inner: '#b9b7b2' },
-    '/model/burgundy_leather_jacket_3d_model.glb': { body: '#802329', zip: '#C0C0C0', inner: '#b9b7b2' },
-    '/model/tan_leather_jacket_3d_model.glb': { body: '#C58B55', zip: '#C0C0C0', inner: '#b9b7b2' },
-    '/model/jacket_2.glb': { body: '#4A2E5B', zip: '#C0C0C0', inner: '#111111' },
-    '/model/leather_jacket_3d_model.glb': { body: '#000000', zip: '#C0C0C0', inner: '#b9b7b2' },
-    '/model/jacket_model.glb': { body: '#7A4328', zip: '#C0C0C0', inner: '#b9b7b2' },
-    '/model/bomber_jacket_ribbed(1).glb': { body: '#1C495C', zip: '#C0C0C0', inner: '#b9b7b2' },
-    '/model/maroon.glb': { body: '#800000', zip: '#C0C0C0', inner: '#b9b7b2' },
-    '/model/hoddy.glb': { body: '#2c1914', zip: '#C0C0C0', inner: '#b9b7b2' },
-    '/model/brown_trucker.glb': { body: '#2c1914', zip: '#C0C0C0', inner: '#b9b7b2' },
-    '/model/leather_shearling.glb': { body: '#2c1914', zip: '#C0C0C0', inner: '#b9b7b2' },
-     '/model/Real_Leather.glb': { body: '#800000', zip: '#C0C0C0', inner: '#b9b7b2' },
-      '/model/Women_Blue_Leather.glb': { body: '#4A2E5B', zip: '#C0C0C0', inner: '#111111' },
-       '/model/hoddy.glb': { body: '#4A2E5B', zip: '#C0C0C0', inner: '#111111' },
+  currentModel: "/model/Men’s Genuine Leather Maverick Jacket–Shirt Collar Style.glb",
+  currentTexture: "/textures/Leather Texture Transparent.jpg",
+  // currentShearlingTexture: "/textures/shearling/smart texture.png",
+  autoRotate: false,
 
-  }
+  prices: {
+    "/model/Men’s Genuine Leather Maverick Jacket–Shirt Collar Style.glb": 149.99,
+    "/model/Men’s Real Leather Black 3/4 Length Shearling Style": 215,
+    "/model/Men’s Blue Leather Jacket with Faux Fur Collar.glb": 149.99,
+    "/model/Men’s Cognac Brown Real Lambskin Leather Bomber Jacket – Classic Leather Jacket.glb": 159.99,
+    "/model/Men’s Black Lambskin Faux Fur Shearling Leather Bomber Jacket.glb": 199.99,
+    "/model/Men’s Maroon Lambskin Faux Fur Shearling Leather Bomber Jacket.glb": 199.99,
+    "/model/Men’s  Real Lambskin Leather Bomber Jacket – Classic Zip-Up Leather Jacket.glb": 159.99,
+
+    //women jackets prices
+    "/model/Women’s Black Real Leather B3 Bomber Cream Shearling Jacket.glb": 199.99,
+    "/model/Women’s Cognac Cropped Genuine Lambskin Leather Trucker Jacket.glb": 149.99,
+    "/model/Women’s Cognac Brown Genuine Lambskin Leather Bomber Jacket.glb": 159.99,
+    "/model/Women’s Black Genuine Lambskin Leather 3/4 Length Coat Faux Fur Shearling.glb": 215,
+    "/model/Women’s Blue Real Lambskin Leather Bomber Jacket – Classic Zip-Up Leather Jacket.glb": 159.99,
+    "/model/Women’s Hooded Black Real Lambskin Leather Faux Shearling Aviator Jacket.glb": 199.99,
+  },
+
+  // Dynamic settings per model (Objects for zippers)
+  modelsSettings: {
+    "/model/Men’s Genuine Leather Maverick Jacket–Shirt Collar Style.glb": { 
+      body: "#692a288f", 
+      inner: "#0c0b0b", 
+      zip: { hex: '#D8D8D8', metalness: 1.0, roughness: 0.15 } 
+    },
+    "/model/Men’s Real Leather Black 3/4 Length Shearling Style.glb": { 
+      body: "#2A2A2A", 
+      inner: "#d8d8d89a", 
+      zip: { hex: '#D8D8D8', metalness: 1.0, roughness: 0.15 } 
+    },
+    "/model/Men’s Blue Leather Jacket with Faux Fur Collar.glb": { 
+      body: "#21656e", 
+      inner: "#c2bcbc", 
+      zip: { hex: '#8C7748', metalness: 0.85, roughness: 0.40 } 
+    },
+    "/model/Men’s Cognac Brown Real Lambskin Leather Bomber Jacket – Classic Leather Jacket.glb": { 
+      body: "#8B4513", 
+      inner: "#0a0909", 
+      zip: { hex: '#5C6166', metalness: 0.9, roughness: 0.35 } 
+    },
+    "/model/Men’s Black Lambskin Faux Fur Shearling Leather Bomber Jacket.glb": { 
+      body: "#000000", 
+      inner: "#744326", 
+      zip: { hex: '#D8D8D8', metalness: 1.0, roughness: 0.15 } 
+    },
+    "/model/Men’s Maroon Lambskin Faux Fur Shearling Leather Bomber Jacket.glb": { 
+      body: "#6d3f36", 
+      inner: "#0c0b0b", 
+      zip: { hex: '#D8D8D8', metalness: 1.0, roughness: 0.15 } 
+    },
+    "/model/Men’s  Real Lambskin Leather Bomber Jacket – Classic Zip-Up Leather Jacket.glb": { 
+      body: "#8B4513", 
+      inner: "#0c0c0c", 
+      zip: { hex: '#D8D8D8', metalness: 1.0, roughness: 0.15 } 
+    },
+
+
+    "/model/Women’s Black Real Leather B3 Bomber Cream Shearling Jacket.glb": { 
+      body: "#000000", 
+      inner: "#080808", 
+      zip: { hex: '#D8D8D8', metalness: 1.0, roughness: 0.15 } 
+    },
+    "/model/Women’s Cognac Cropped Genuine Lambskin Leather Trucker Jacket.glb": { 
+      body: "#80592d", 
+      inner: "#020202", 
+      zip: { hex: '#214344', metalness: 0.85, roughness: 0.40 } 
+    },
+    "/model/Women’s Cognac Brown Genuine Lambskin Leather Bomber Jacket.glb": { 
+      body: "#8b622d", 
+      inner: "#000000", 
+      zip: { hex: '#5C6166', metalness: 0.9, roughness: 0.35 } 
+    },
+    "/model/Women’s Black Genuine Lambskin Leather 3/4 Length Coat Faux Fur Shearling.glb": { 
+      body: "#0c0b0b", 
+      inner: "#080808", 
+      zip: { hex: '#D8D8D8', metalness: 1.0, roughness: 0.15 } 
+    },
+    "/model/Women’s Blue Real Lambskin Leather Bomber Jacket – Classic Zip-Up Leather Jacket.glb": { 
+      body: "#172e6d", 
+      inner: "#050505", 
+      zip: { hex: '#D8D8D8', metalness: 1.0, roughness: 0.15 } 
+    },
+    "/model/Women’s Hooded Black Real Lambskin Leather Faux Shearling Aviator Jacket.glb": { 
+      body: "#1A1A1A", 
+      inner: "#050505", 
+      zip: { hex: '#5C6166', metalness: 0.9, roughness: 0.35 } 
+    }
+  },
+
+  // Cart Array
+  cart: []
 });
 
-export const modelData = [
-  { id: 'man', name: 'Man Jacket', path: '/model/leather_coat_3d_model.glb' },
-  { id: 'woman', name: 'Woman Jacket', path: '/model/jacket_2.glb' }
-];
-
 export const bodyColors = [
-  { id: 'dark_chocolate', name: 'Dark Chocolate Brown', value: '#2c1914' },
-  { id: 'deep_purple', name: 'Deep Purple', value: '#4A2E5B' },
-  { id: 'wine_maroon', name: 'Wine Red / Maroon', value: '#802329' },
-  { id: 'tan_camel', name: 'Tan / Camel Leather', value: '#C58B55' },
-  { id: 'classic_cognac', name: 'Classic Cognac Brown', value: '#7A4328' },
-  { id: 'teal_petrol', name: 'Teal Blue / Petrol', value: '#1C495C' },
-  { id: 'classic_black', name: 'Classic Black', value: '#000000' }
+  { id: 'purple', name: 'PURPLE', value: '#322681' },
+  { id: 'dark_brown', name: 'DARK BROWN', value: '#2c1914' },
+  { id: 'cognac', name: 'COGNAC', value: '#7A4328' },
+  { id: 'maroon', name: 'MAROON', value: '#802329' },
+  { id: 'black', name: 'BLACK', value: '#080808' },
+  { id: 'blue', name: 'BLUE', value: '#172e6d' }
 ];
 
 export const shearlingColors = [
-  '#b9b7b2', // Natural Cream
-  '#362219', // Deep Espresso Brown
-  '#111111', // Classic Jet Black
-  '#6E381A'  // Chestnut / Ginger Brown
+  { id: "cream", value: "#a79675" },
+  { id: "black", value: "#000000" },
+  { id: "Tan Brown", value: "#703511" },
+  { id: "Dark Brown", value: "#36241c" }
+ 
+
 ];
+
+export const modelData = [
+  { id: "man", name: "Man Jacket", path: "/model/Men’s Genuine Leather Maverick Jacket–Shirt Collar Style.glb" },
+  { id: "woman", name: "Woman Jacket", path: "/model/Women’s Black Real Leather B3 Bomber Cream Shearling Jacket.glb" }
+];
+

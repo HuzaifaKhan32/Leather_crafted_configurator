@@ -1,85 +1,146 @@
-import React, { useLayoutEffect, useMemo } from 'react';
-import { useGLTF, useTexture } from '@react-three/drei';
+import React, { useEffect, useState, useMemo } from 'react';
+import { useGLTF } from '@react-three/drei';
 import { useSnapshot } from 'valtio';
 import { state } from '../store';
 import * as THREE from 'three';
 
+const formatHexColor = (color) => {
+  if (typeof color === 'string' && color.startsWith('#') && color.length === 9) {
+    return color.substring(0, 7);
+  }
+  return color;
+};
+
+// Clean string comparison function to handle extra spaces & apostrophe variations
+const normalizePath = (path) => {
+  if (!path) return '';
+  return path
+    .toLowerCase()
+    .replace(/[’']/g, "'")
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
+const fixedBlackInnerModels = [
+  "/model/Men’s  Real Lambskin Leather Bomber Jacket – Classic Zip-Up Leather Jacket.glb",
+  "/model/Women’s Cognac Brown Genuine Lambskin Leather Bomber Jacket.glb",
+  "/model/Women’s Blue Real Lambskin Leather Bomber Jacket – Classic Zip-Up Leather Jacket.glb"
+].map(normalizePath);
+
 export function JacketModel() {
   const snap = useSnapshot(state);
-  
   const currentModelPath = snap.currentModel; 
 
   const { scene } = useGLTF(currentModelPath);
-  const clonedScene = useMemo(() => scene.clone(), [scene]);
 
-  const leatherTexture = useTexture(snap.currentTexture);
-  const shearlingColorMap = useTexture(snap.currentShearlingTexture);
+  // Dynamic Texture State
+  const [leatherTexture, setLeatherTexture] = useState(null);
 
-  useMemo(() => {
-    if (leatherTexture) {
-      leatherTexture.wrapS = THREE.RepeatWrapping;
-      leatherTexture.wrapT = THREE.RepeatWrapping;
-      leatherTexture.repeat.set(10, 10);
-      leatherTexture.needsUpdate = true;
-    }
+  // Async texture load
+  useEffect(() => {
+    const texturePath = snap.currentTexture || '/textures/leather_default.png';
+    const loader = new THREE.TextureLoader();
     
-    if (shearlingColorMap) {
-      shearlingColorMap.wrapS = THREE.RepeatWrapping;
-      shearlingColorMap.wrapT = THREE.RepeatWrapping;
-      shearlingColorMap.repeat.set(8, 8); 
-      shearlingColorMap.anisotropy = 16;
-      shearlingColorMap.colorSpace = THREE.SRGBColorSpace;
-      shearlingColorMap.needsUpdate = true;
-    }
-  }, [leatherTexture, shearlingColorMap]);
+    loader.load(texturePath, (tex) => {
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      tex.generateMipmaps = true;
+      tex.repeat.set(4, 4);
+      tex.needsUpdate = true;
+      setLeatherTexture(tex);
+    });
+  }, [snap.currentTexture]);
 
-  useLayoutEffect(() => {
-    // 🔍 1. Pehle original state proxy par check karein agar ye path exist nahi karta toh initialize karein
-    if (state.modelsSettings && !state.modelsSettings[currentModelPath]) {
-      state.modelsSettings[currentModelPath] = {
-        body: state.modelsSettings['/model/jacket_model.glb']?.body || "#ffffff",
-        inner: state.modelsSettings['/model/jacket_model.glb']?.inner || "#ffffff",
-        zip: state.modelsSettings['/model/jacket_model.glb']?.zip || "#C0C0C0"
-      };
-    }
+  // Scene & materials clone
+  const clonedScene = useMemo(() => {
+    const clone = scene.clone(true);
+    clone.traverse((child) => {
+      if (child.isMesh && child.material) {
+        child.material = child.material.clone();
+      }
+    });
+    return clone;
+  }, [scene]);
 
-    // 🔍 2. Ab snapshot se read karein taaki jab bhi button click ho, component automatic re-render ho sake
-    const activeItems = snap.modelsSettings?.[currentModelPath];
+  // Material Updates
+  useEffect(() => {
+    const activeItems = snap.modelsSettings?.[currentModelPath] || {
+      body: "#ffffff",
+      inner: "#ffffff",
+      zip: "#C0C0C0"
+    };
 
-    if (!activeItems) return; // Guard clause agar state ready na ho
+    const isJecketGlb = currentModelPath.toLowerCase().includes('jecket');
+    const isJacketModel = currentModelPath.toLowerCase().includes('jacket_model.glb');
+    
+    // Normalized check for exact matching
+    const normalizedCurrentPath = normalizePath(currentModelPath);
+    const isFixedBlackInner = fixedBlackInnerModels.some((path) => normalizedCurrentPath.includes(path) || path.includes(normalizedCurrentPath));
 
     clonedScene.traverse((child) => {
       if (child.isMesh && child.material) {
         child.castShadow = true;
         child.receiveShadow = true;
 
-        child.material = child.material.clone();
         const matName = child.material.name ? child.material.name.toLowerCase() : '';
-
+        const meshName = child.name ? child.name.toLowerCase() : '';
         const isBurgundyModel = currentModelPath.toLowerCase().includes('burgundy');
 
-        // 1. --- INNER / COLLAR / SHEARLING TARGET AREA ---
-        if (
+        const isButton = matName.includes('button') || matName.includes('btn') || meshName.includes('button') || meshName.includes('btn');
+
+        // 1. ZIPPER AND RUNNERS
+        const isZipMesh = 
+          matName.includes('zip') || 
+          matName.includes('runner') || 
+          matName.includes('zipper') ||
+          matName.includes('metal') || 
+          matName.includes('405') || 
+          matName.includes('500') ||
+          (isJacketModel && matName.includes('fallback'));
+
+        if (!isButton && isZipMesh) {
+          if (activeItems.zip) {
+            const zipHex = typeof activeItems.zip === 'object' ? activeItems.zip.hex : activeItems.zip;
+            const metalnessVal = typeof activeItems.zip === 'object' ? (activeItems.zip.metalness ?? 0.95) : 0.95;
+            const roughnessVal = typeof activeItems.zip === 'object' ? (activeItems.zip.roughness ?? 0.3) : 0.3;
+
+            child.material.map = null;
+            child.material.color.set(formatHexColor(zipHex));
+            child.material.metalness = metalnessVal;
+            child.material.roughness = roughnessVal;
+          }
+        }
+
+        // 2. INNER / COLLAR / SHEARLING
+        else if (
           matName.includes('inner') || 
           matName.includes('collar') || 
-          matName.includes('407') || 
+          meshName.includes('inner') ||
+          meshName.includes('lining') ||
+          (!isJacketModel && matName.includes('407')) || 
           matName.includes('material__777') ||
-          matName.includes('fur')
+          matName.includes('fur') ||
+          matName.includes('300') 
         ) {
-          if (shearlingColorMap) {
-            child.material.map = shearlingColorMap;
-            child.material.bumpMap = shearlingColorMap; 
-            child.material.bumpScale = 0.04; 
+          child.material.map = null;
+          child.material.bumpMap = null;
+
+          if (isFixedBlackInner) {
+            // Lock color to Black
+            child.material.color.set("#000000");
+          } else if (activeItems.inner) {
+            child.material.color.set(formatHexColor(activeItems.inner));
           }
-          if (activeItems.inner) {
-            child.material.color.set(activeItems.inner);
-          }
-          child.material.roughness = 0.95;    
+    
+          child.material.roughness = 0.85;    
           child.material.metalness = 0.0;     
         }
         
-        // 2. --- MAIN JACKET BODY LEATHER TARGET AREA ---
+        // 3. MAIN BODY & BUTTONS
         else if (
+          isButton || 
           matName.includes('body') || 
           matName.includes('jacket') || 
           matName.includes('406') || 
@@ -87,59 +148,38 @@ export function JacketModel() {
           matName.includes('778') ||
           (isBurgundyModel && !matName.includes('405')) 
         ) {
-          if (leatherTexture) {
+          if (activeItems.body) {
+            child.material.color.set(formatHexColor(activeItems.body));
+          }
+
+          if (leatherTexture && !isButton) {
             child.material.map = leatherTexture;
           }
-          if (activeItems.body) {
-            child.material.color.set(activeItems.body);
+
+          child.material.roughness = isJecketGlb ? 0.99 : 0.75; 
+          child.material.metalness = isButton ? 0.3 : (isJecketGlb ? 0.15 : 0.15);
+
+          if (isJecketGlb) {
+            child.material.bumpMap = null;
+            child.material.normalMap = null;
           }
-          child.material.roughness = 0.7; 
-          child.material.metalness = 0.15;
-        } 
-        
-        // 3. --- ZIPPER AND RUNNERS TARGET AREA ---
-        else if (
-          matName.includes('zip') || 
-          matName.includes('runner') || 
-          matName.includes('405') || 
-          matName.includes('500') || 
-          matName.includes('metal') || 
-          matName.includes('hardware')
-        ) {
-          if (activeItems.zip) {
-            child.material.color.set(activeItems.zip);
-          }
-          child.material.metalness = 1.0;  
-          child.material.roughness = 0.12; 
         }
+
         child.material.needsUpdate = true;
       }
     });
-  }, [clonedScene, currentModelPath, leatherTexture, shearlingColorMap, snap.modelsSettings]); 
+  }, [clonedScene, currentModelPath, leatherTexture, snap.modelsSettings]); 
 
   const isBomber = currentModelPath.includes('bomber_jacket_ribbed');
 
   return (
     <primitive 
       object={clonedScene} 
-      rotation={isBomber ? [-Math.PI / 2, 0, 0] : [0, 0, 0]} 
-      position={isBomber ? [0, 0.1, 0] : [0, 0, 0]} 
-      scale={[1, 1, 1]}
+      rotation={[0, 0, 0]} 
+      position={isBomber ? [0, -0.85, 0] : [0, 0, 0]} 
+      scale={isBomber ? [0.85, 0.85, 0.85] : [1, 1, 1]}
     />
   );
 }
 
-// Pre-fetching targets
-useGLTF.preload('/model/leather_coat_3d_model.glb');
-useGLTF.preload('/model/burgundy_leather_jacket_3d_model.glb');
-useGLTF.preload('/model/tan_leather_jacket_3d_model.glb');
-useGLTF.preload('/model/jacket_2.glb');
-useGLTF.preload('/model/leather_jacket_3d_model.glb');
 useGLTF.preload('/model/jacket_model.glb');
-useGLTF.preload('/model/bomber_jacket_ribbed(1).glb');
-useGLTF.preload('/model/maroon.glb');
-useGLTF.preload('/model/brown_trucker.glb');
-useGLTF.preload('/model/Leather_Shearling.glb');
-useGLTF.preload('/model/Real_Leather.glb');
-useGLTF.preload('/model/Women_Blue_Leather.glb');
-useGLTF.preload('/model/hoddy.glb');

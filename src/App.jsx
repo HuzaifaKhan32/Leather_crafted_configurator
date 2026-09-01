@@ -1,58 +1,64 @@
-import React, { useState } from 'react';
-import JacketCanvas from './components/JacketCanvas.jsx';
-import Sidebar from './components/Sidebar.jsx';
-import MainPanel from './components/MainPanel.jsx';
+import React, { useState, useEffect } from 'react';
+import Sidebar from './components/Sidebar';
+import MainPanel from './components/MainPanel';
+import JacketCanvas from './components/JacketCanvas';
+import Logo from './components/Logo';
 import ScreenshotButton from './components/ScreenshotButton';
-import Logo from './components/Logo.jsx';
-
+import AddToCartButton from './components/AddToCartButton';
+import CartDrawer from './components/CartDrawer';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState(null);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  
+  // 1. Active Jacket Model track karne ke liye state
+  const [currentModel, setCurrentModel] = useState(null);
+
+  // 2. Model switch hotay hi previous history aur storage clear karne ka logic
+  useEffect(() => {
+    if (currentModel) {
+      // Storage aur cart history wipe
+      localStorage.removeItem('jacket_customization');
+      localStorage.removeItem('cart_data');
+      
+      // Optional: Agar model badalte hi drawer auto-close ya reset karna ho:
+      setIsCartOpen(false);
+    }
+  }, [currentModel?.id]); // Jab bhi model ID change hogi yeh fire hoga
 
   return (
-    <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden', background: '#92cae4' }}>
+    <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
       <Logo />
       
-      {/* 3D Scene */}
-      <JacketCanvas />
+      {/* Canvas ko current model ki state pass karein */}
+      <JacketCanvas currentModel={currentModel} />
 
-      {/* 1. Sidebar (Left Side) */}
-      <div style={{ position: 'absolute', left: '20px', top: '200px', zIndex: 100 }}>
-        <Sidebar setActiveTab={setActiveTab} activeTab={activeTab} />
-      </div>
+      <ScreenshotButton onCapture={() => console.log('Capture')} />
 
-      {/* 2. MainPanel */}
-      {activeTab && (
-        <div style={{ 
-          position: 'absolute', 
-          left: '120px', 
-          top: '150px', 
-          zIndex: 1000 
-        }}>
-          <MainPanel activeCategory={activeTab} onClose={() => setActiveTab(null)} />
-        </div>
+      {/* Cart Button */}
+      <AddToCartButton onOpenCart={() => setIsCartOpen(true)} />
+
+      {/* Cart Drawer Modal ko model ki details pass karein */}
+      <CartDrawer 
+        isOpen={isCartOpen} 
+        onClose={() => setIsCartOpen(false)} 
+        model={currentModel}
+        onRemoveModel={() => setCurrentModel(null)}
+      />
+
+      {!activeTab ? (
+        <Sidebar 
+          activeTab={activeTab} 
+          setActiveTab={setActiveTab} 
+          onSelectModel={(model) => setCurrentModel(model)} // Model selection handler
+        />
+      ) : (
+        <MainPanel 
+          activeCategory={activeTab} 
+          onClose={() => setActiveTab(null)} 
+          onSelectModel={(model) => setCurrentModel(model)} // Model selection handler
+        />
       )}
-      
-      {/* 3. Screenshot Button (Niche Left Side Corner Par) */}
-      <div style={{ position: 'absolute', bottom: '40px', left: '40px', zIndex: 100 }}>
-        <ScreenshotButton />
-      </div>
-
-      {/* 4. Add to Cart Button (Ab Ye Niche Right Side Corner Par Hai) */}
-      <div style={{ position: 'absolute', bottom: '40px', right: '40px', zIndex: 100 }}>
-        <button 
-          onClick={() => alert("Added to Cart!")}
-          style={{
-            cursor: 'pointer', border: 'none', padding: '15px 25px', borderRadius: '999px', 
-            color: '#fff', fontSize: '16px', fontWeight: '600',
-            background: 'linear-gradient(180deg, #8b5a32 0%, #000000 100%)',
-            boxShadow: '0 10px 20px rgba(0,0,0,0.2)', transition: 'all 0.3s ease'
-          }}
-        >
-          🛒 Add to Cart
-        </button>
-      </div>
-
     </div>
   );
 }

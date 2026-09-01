@@ -1,0 +1,71 @@
+.post_item_404 .page_title {
+  font-size: 21.9vw;
+  letter-spacing: -0.01em;
+  color: var(--theme-color-text_link_02);
+}
+.post_item_404 .page_description {
+  font-size: 1rem;
+}
+.post_item_404 .post_content .all-svg {
+  display: none;
+}
+
+.error404 .page_content_wrap,
+.search-no-results .page_content_wrap {
+  background-color: var(--theme-color-bg_color);
+}
+
+.adp-popup-type-content.adp-popup-open .sc_button.adp-popup-close {
+  position: unset;
+  color: var(--theme-color-inverse_link) !important;
+}
+.adp-popup-type-content.adp-popup-open .sc_button.adp-popup-close:before {
+  display: none;
+}
+
+.rs_radius_10 rs-module {
+  border-radius: 10px;
+}
+
+.sc_icons_fill .sc_icons_item {
+  background-color: var(--theme-color-alter_bg_color);
+}
+
+#style-3.mc4wp-form input[type="checkbox"] + label:before {
+  border-color: var(--theme-color-input_dark) !important;
+}
+#style-3.mc4wp-form .mc4wp-form-fields button:hover, #style-3.mc4wp-form .mc4wp-form-fields button:focus, #style-3.mc4wp-form .mc4wp-form-fields button:active,
+#style-3.mc4wp-form .mc4wp-form-fields input[type="submit"]:hover,
+#style-3.mc4wp-form .mc4wp-form-fields input[type="submit"]:focus,
+#style-3.mc4wp-form .mc4wp-form-fields input[type="submit"]:active {
+  color: var(--theme-color-text_dark_08) !important;
+}
+#style-3.mc4wp-form .mc4wp-form-fields button:hover:before, #style-3.mc4wp-form .mc4wp-form-fields button:focus:before, #style-3.mc4wp-form .mc4wp-form-fields button:active:before,
+#style-3.mc4wp-form .mc4wp-form-fields input[type="submit"]:hover:before,
+#style-3.mc4wp-form .mc4wp-form-fields input[type="submit"]:focus:before,
+#style-3.mc4wp-form .mc4wp-form-fields input[type="submit"]:active:before {
+  color: var(--theme-color-text_dark_08);
+}
+
+#style-4.mc4wp-form label {
+  color: var(--theme-color-extra_light);
+}
+#style-4.mc4wp-form label a {
+  color: var(--theme-color-extra_light);
+  border-color: var(--theme-color-extra_light);
+}
+#style-4.mc4wp-form label a:hover {
+  color: var(--theme-color-extra_light_08);
+  border-color: var(--theme-color-extra_light_08);
+}
+#style-4.mc4wp-form input[type="checkbox"] + label:before {
+  color: var(--theme-color-bd_color);
+}
+
+@media (max-width: 767px) {
+  .post_item_404 .page_title {
+    font-size: 150px;
+  }
+}
+
+/*# sourceMappingURL=skin-upgrade-style.css.map */
