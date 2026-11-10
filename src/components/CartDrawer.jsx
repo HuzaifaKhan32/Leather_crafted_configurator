@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useSnapshot } from 'valtio';
 import { state } from '../store';
 
@@ -126,11 +126,10 @@ const getProductId = (modelName = '') => {
   return 79567;
 };
 
-export default function CartDrawer({ isOpen, onClose, currentModel }) {
+export default function CartDrawer({ isOpen, onClose, currentModel, onOpenSizeGuide }) {
   const snap = useSnapshot(state);
-  const [showSizeModal, setShowSizeModal] = useState(false);
 
-  // Sync Cart Data with LocalStorage on Load
+  // Sync Cart Data with LocalStorage
   useEffect(() => {
     const savedCart = localStorage.getItem('jacket_cart');
     if (savedCart && state.cart.length === 0) {
@@ -138,14 +137,14 @@ export default function CartDrawer({ isOpen, onClose, currentModel }) {
     }
   }, []);
 
-  // Active Model badalne par Cart / Storage reset karne ka logic
+  // Reset cart when active model changes
   useEffect(() => {
-    if (currentModel) {
-      state.cart = [];
-      localStorage.removeItem('jacket_cart');
-      localStorage.removeItem('jacket_customization');
-    }
-  }, [currentModel?.id]);
+  if (currentModel) {
+    state.cart = [];
+    localStorage.removeItem('jacket_cart');
+    localStorage.removeItem('jacket_customization');
+  }
+}, [currentModel]);
 
   if (!isOpen) return null;
 
@@ -208,20 +207,35 @@ export default function CartDrawer({ isOpen, onClose, currentModel }) {
     window.location.href = customizerEndpoint;
   };
 
-  const totalPrice = snap.cart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
+  const totalPrice = Number(snap.cart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0).toFixed(2));
   const totalItemCount = snap.cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
 
   return (
-    <div className="cart-modal-overlay" onClick={onClose}>
+    <div className="cart-modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-label="Shopping Bag">
       <div className="cart-modal-content" onClick={(e) => e.stopPropagation()}>
+        {/* Header */}
         <div className="cart-header">
-          <h3>Your Customizations ({totalItemCount})</h3>
-          <span className="close-btn" onClick={onClose}>✕</span>
+          <div className="cart-header-title-group">
+            <span className="cart-eyebrow">YOUR BESPOKE ORDER</span>
+            <h3>Shopping Bag ({totalItemCount})</h3>
+          </div>
+          <button className="cart-close-btn" onClick={onClose} aria-label="Close bag">✕</button>
         </div>
 
+        {/* Item List */}
         <div className="cart-items-list">
           {snap.cart.length === 0 ? (
-            <p className="empty-msg">Your cart is empty.</p>
+            <div className="empty-cart-state">
+              <div className="empty-cart-icon">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                  <path d="M3 6h18"></path>
+                  <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+              </div>
+              <p className="empty-msg">Your bespoke bag is currently empty.</p>
+              <span className="empty-hint">Customize your jacket and click "Add to Bag" to begin.</span>
+            </div>
           ) : (
             snap.cart.map((item) => (
               <div key={item.id} className="cart-item-card">
@@ -233,11 +247,17 @@ export default function CartDrawer({ isOpen, onClose, currentModel }) {
 
                 <div className="item-info">
                   <div className="item-header-row">
-                    <h4 style={{ textTransform: 'capitalize' }}>{item.modelName || 'Zipper Bomber Jacket'}</h4>
-                    <button className="remove-btn" onClick={() => handleRemove(item.id)}>Remove</button>
+                    <h4 className="item-name">{item.modelName || 'Custom Jacket'}</h4>
+                    <button className="remove-btn" onClick={() => handleRemove(item.id)} title="Remove item">✕</button>
                   </div>
 
-                  <p className="price-tag">Price: <strong>${item.price * (item.quantity || 1)}</strong></p>
+                  <p className="price-tag">
+                    <span className="price-label">Subtotal:</span>
+                    <strong className="price-amount">${(item.price * (item.quantity || 1)).toFixed(2)}</strong>
+                    {item.quantity > 1 && (
+                      <span className="per-item-note">(${item.price} each)</span>
+                    )}
+                  </p>
 
                   <div className="color-details-list">
                     {item.colors &&
@@ -252,6 +272,7 @@ export default function CartDrawer({ isOpen, onClose, currentModel }) {
                               style={{ backgroundColor: finalColorHex }}
                               title={`${partLabels[partKey] || partKey}: ${displayColorName}`}
                             />
+                            <span className="color-val-label">{displayColorName}</span>
                           </div>
                         );
                       })}
@@ -259,37 +280,39 @@ export default function CartDrawer({ isOpen, onClose, currentModel }) {
 
                   <div className="size-select-row">
                     <div className="size-left">
-                      <label>Size:</label>
+                      <label className="size-label">Size:</label>
                       <select
                         value={item.size || 'M'}
                         onChange={(e) => handleSizeChange(item.id, e.target.value)}
                         className="size-dropdown"
                       >
-                        <option value="XS">XS</option>
-                        <option value="S">S</option>
-                        <option value="M">M</option>
-                        <option value="L">L</option>
-                        <option value="XL">XL</option>
-                        <option value="XXL">XXL</option>
-                        <option value="XXXL">XXXL</option>
+                        <option value="XS">XS (Extra Small)</option>
+                        <option value="S">S (Small)</option>
+                        <option value="M">M (Medium)</option>
+                        <option value="L">L (Large)</option>
+                        <option value="XL">XL (Extra Large)</option>
+                        <option value="XXL">XXL (2X Large)</option>
+                        <option value="XXXL">XXXL (3X Large)</option>
                       </select>
                     </div>
 
-                    <button className="size-guide-trigger" onClick={() => setShowSizeModal(true)}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="2" y="6" width="20" height="12" rx="2"></rect>
-                        <path d="M6 6v4M10 6v2M14 6v4M18 6v2"></path>
-                      </svg>
-                      <span>Size Guide</span>
-                    </button>
+                    {onOpenSizeGuide && (
+                      <button className="size-guide-trigger" onClick={onOpenSizeGuide} type="button">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+                          <path d="M6 6v4M10 6v2M14 6v4M18 6v2"></path>
+                        </svg>
+                        <span>Size Chart</span>
+                      </button>
+                    )}
                   </div>
 
                   <div className="qty-control-row">
-                    <span>Qty:</span>
+                    <span className="qty-label">Quantity:</span>
                     <div className="qty-picker">
-                      <button onClick={() => handleQtyChange(item.id, -1)}>-</button>
-                      <span>{item.quantity || 1}</span>
-                      <button onClick={() => handleQtyChange(item.id, 1)}>+</button>
+                      <button onClick={() => handleQtyChange(item.id, -1)} aria-label="Decrease quantity">−</button>
+                      <span className="qty-val">{item.quantity || 1}</span>
+                      <button onClick={() => handleQtyChange(item.id, 1)} aria-label="Increase quantity">+</button>
                     </div>
                   </div>
                 </div>
@@ -298,251 +321,309 @@ export default function CartDrawer({ isOpen, onClose, currentModel }) {
           )}
         </div>
 
+        {/* Footer Summary & Checkout */}
         {snap.cart.length > 0 && (
           <div className="cart-footer">
             <div className="total-row">
-              <span>Total Amount:</span>
-              <strong>${totalPrice}</strong>
+              <div className="total-label-group">
+                <span className="total-eyebrow">ORDER TOTAL</span>
+                <span className="total-label">Grand Total</span>
+              </div>
+              <strong className="total-price">${totalPrice.toFixed(2)}</strong>
             </div>
-            <button className="checkout-btn place-order-btn" onClick={handleProceedToWooCheckout}>
-              Proceed to Checkout →
+
+            <div className="shipping-perk-badge">
+              <span>✦ Free Worldwide Express Insured Delivery</span>
+            </div>
+
+            <button className="checkout-btn place-order-btn" onClick={handleProceedToWooCheckout} type="button">
+              <span>Proceed to Checkout</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
             </button>
           </div>
         )}
       </div>
 
-      {showSizeModal && (
-        <div className="guide-modal-overlay" onClick={() => setShowSizeModal(false)}>
-          <div className="guide-modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="guide-modal-header">
-              <h3>Size Guide</h3>
-              <span className="close-btn" onClick={() => setShowSizeModal(false)}>✕</span>
-            </div>
-
-            <div className="guide-modal-body">
-              <div className="table-responsive">
-                <table className="custom-size-table">
-                  <tbody>
-                    <tr>
-                      <td><strong>XS</strong></td>
-                      <td>33 - 34</td>
-                      <td>27 - 28</td>
-                      <td>37 - 38</td>
-                    </tr>
-                    <tr>
-                      <td><strong>S</strong></td>
-                      <td>35 - 36</td>
-                      <td>29 - 30</td>
-                      <td>39 - 40</td>
-                    </tr>
-                    <tr>
-                      <td><strong>M</strong></td>
-                      <td>37 - 38</td>
-                      <td>31 - 32</td>
-                      <td>41 - 42</td>
-                    </tr>
-                    <tr>
-                      <td><strong>L</strong></td>
-                      <td>39 - 40</td>
-                      <td>33 - 34</td>
-                      <td>43 - 44</td>
-                    </tr>
-                    <tr>
-                      <td><strong>XL</strong></td>
-                      <td>41 - 43</td>
-                      <td>35 - 37</td>
-                      <td>45 - 47</td>
-                    </tr>
-                    <tr>
-                      <td><strong>XXL</strong></td>
-                      <td>44 - 46</td>
-                      <td>38 - 39</td>
-                      <td>48 - 49</td>
-                    </tr>
-                    <tr>
-                      <td><strong>XXXL</strong></td>
-                      <td>47 - 49</td>
-                      <td>40 - 42</td>
-                      <td>50 - 52</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <div className="size-info-box">
-                <h4>WHAT SIZE SHOULD I PICK?</h4>
-                
-                <div className="info-section">
-                  <p className="section-title">Body Bust Measurement</p>
-                  <p className="section-desc">
-                    Take a tape measure and wrap it under your armpits at the fullest part of your bust.
-                  </p>
-                </div>
-
-                <div className="info-section">
-                  <p className="section-title">Size Selection Tip</p>
-                  <p className="section-desc">
-                    If your body bust is 37"-38" , your jacket chest will be 43".
-                  </p>
-                </div>
-
-                <div className="info-section">
-                  <p className="section-title">Contact Us</p>
-                  <p className="section-desc">
-                    For further information on size advice or customization, please drop us a message.
-                  </p>
-                </div>
-              </div>
-
-              <div className="measurement-guide-container">
-                <div className="guide-illustration">
-                  <svg width="100" height="230" viewBox="0 0 100 230" fill="none" stroke="#666" strokeWidth="1.5">
-                    <circle cx="50" cy="20" r="14" />
-                    <path d="M35 34 C35 34 25 45 20 70 C18 80 20 110 22 130 L32 220 M65 34 C65 34 75 45 80 70 C82 80 80 110 78 130 L68 220" />
-                    <path d="M35 34 L65 34" />
-                    
-                    <line x1="22" y1="75" x2="78" y2="75" stroke="#e98400" strokeWidth="2" />
-                    <circle cx="78" cy="75" r="7" fill="#000" />
-                    <text x="78" y="78" fill="#fff" fontSize="9" textAnchor="middle" stroke="none">1</text>
-                    
-                    <line x1="26" y1="105" x2="74" y2="105" stroke="#e98400" strokeWidth="2" />
-                    <circle cx="26" cy="105" r="7" fill="#000" />
-                    <text x="26" y="108" fill="#fff" fontSize="9" textAnchor="middle" stroke="none">2</text>
-                    
-                    <line x1="24" y1="135" x2="76" y2="135" stroke="#e98400" strokeWidth="2" />
-                    <circle cx="76" cy="135" r="7" fill="#000" />
-                    <text x="76" y="138" fill="#fff" fontSize="9" textAnchor="middle" stroke="none">3</text>
-                  </svg>
-                </div>
-
-                <div className="guide-steps">
-                  <h4>How to Measure your Body?</h4>
-                  
-                  <div className="step-item">
-                    <p className="step-heading">1. Your Bust</p>
-                    <p className="step-text">Measure the circumference over the fullest part of your bust.</p>
-                  </div>
-
-                  <div className="step-item">
-                    <p className="step-heading">2. Your Waist</p>
-                    <p className="step-text">Measure your waist at the thinnest place.</p>
-                  </div>
-
-                  <div className="step-item">
-                    <p className="step-heading">3. Your Hips</p>
-                    <p className="step-text">Measure the fullest part of your hips</p>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
-      )}
-
       <style>{`
         .cart-modal-overlay {
           position: fixed;
           top: 0; left: 0; right: 0; bottom: 0;
-          background: rgba(0, 0, 0, 0.65);
-          backdrop-filter: blur(8px);
+          background: rgba(0, 0, 0, 0.45);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
           z-index: 2000;
           display: flex;
           justify-content: flex-end;
-          align-items: flex-start;
-          padding: 20px;
+          align-items: stretch;
+          overflow: hidden;
+          animation: overlayFadeIn 0.25s ease;
+        }
+
+        @keyframes overlayFadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
         }
 
         .cart-modal-content {
-          width: 420px;
-          max-width: 90vw;
-          height: auto;
-          max-height: 90vh; 
-          background: rgba(20, 20, 20, 0.95);
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          border-radius: 20px;
-          color: #fff;
-          padding: 20px;
+          width: 480px;
+          max-width: 100vw;
+          height: 100%;
+          background: #ffffff;
+          border-left: 1px solid rgba(0, 0, 0, 0.08);
+          color: #111827;
           display: flex;
           flex-direction: column;
-          font-family: 'Inter', sans-serif;
           box-sizing: border-box;
-          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+          box-shadow: -20px 0 50px rgba(0, 0, 0, 0.2);
+          overflow: hidden;
+          animation: drawerSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes drawerSlideIn {
+          from { transform: translateX(100%); }
+          to { transform: translateX(0); }
         }
 
         .cart-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-          padding-bottom: 12px;
-        }
-
-        .cart-header h3 { margin: 0; font-size: 16px; font-weight: 600; }
-        .close-btn { cursor: pointer; font-size: 18px; opacity: 0.7; transition: 0.2s; color: #888; }
-        .close-btn:hover { opacity: 1; color: #fff; }
-
-        .cart-items-list {
-          overflow-y: auto;
-          margin-top: 15px;
-          margin-bottom: 15px;
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-          max-height: 55vh;
-        }
-
-        .empty-msg { text-align: center; margin: 20px 0; opacity: 0.6; font-size: 14px; }
-
-        .cart-item-card {
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          padding: 12px;
-          border-radius: 12px;
-          display: flex;
-          gap: 12px;
-          align-items: center;
-        }
-
-        .item-preview-frame {
-          width: 55px;
-          height: 55px;
-          background: #2a2a2a;
-          border-radius: 8px;
-          overflow: hidden;
+          padding: 24px 24px 18px 24px;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.06);
           flex-shrink: 0;
         }
 
-        .item-preview-frame img { width: 100%; height: 100%; object-fit: cover; }
-        .item-info { flex: 1; }
+        .cart-eyebrow {
+          font-size: 9.5px;
+          letter-spacing: 1.8px;
+          color: #80471c;
+          font-weight: 800;
+          text-transform: uppercase;
+        }
+
+        .cart-header h3 {
+          margin: 3px 0 0 0;
+          font-size: 17px;
+          font-weight: 800;
+          letter-spacing: 0.3px;
+          color: #111827;
+        }
+
+        .cart-close-btn {
+          background: rgba(0, 0, 0, 0.04);
+          border: 1px solid rgba(0, 0, 0, 0.08);
+          color: #6b7280;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          font-size: 13px;
+          transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .cart-close-btn:hover {
+          background: rgba(0, 0, 0, 0.08);
+          color: #111827;
+          transform: rotate(90deg) scale(1.05);
+        }
+
+        .cart-items-list {
+          overflow-y: auto;
+          overflow-x: hidden;
+          flex: 1;
+          padding: 20px 24px;
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+        }
+
+        .empty-cart-state {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          padding: 60px 20px;
+          color: #6b7280;
+        }
+
+        .empty-cart-icon {
+          width: 64px;
+          height: 64px;
+          border-radius: 50%;
+          background: rgba(194, 120, 56, 0.1);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 16px;
+          color: #80471c;
+        }
+
+        .empty-msg {
+          font-size: 15px;
+          font-weight: 700;
+          color: #111827;
+          margin: 0 0 6px 0;
+        }
+
+        .empty-hint {
+          font-size: 12px;
+          color: #9ca3af;
+        }
+
+        .cart-item-card {
+          background: #f9fafb;
+          border: 1px solid rgba(0, 0, 0, 0.08);
+          padding: 16px;
+          border-radius: 20px;
+          display: flex;
+          gap: 16px;
+          align-items: flex-start;
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .cart-item-card:hover {
+          border-color: rgba(194, 120, 56, 0.35);
+          background: #ffffff;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+          transform: translateY(-2px);
+        }
+
+        .item-preview-frame {
+          width: 110px;
+          height: 125px;
+          background: radial-gradient(circle at 50% 45%, #ffffff 0%, #f3f4f6 100%);
+          border-radius: 14px;
+          overflow: hidden;
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid rgba(0, 0, 0, 0.08);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+          position: relative;
+        }
+
+        .item-preview-frame img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center;
+          transform: scale(1.15);
+          transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .cart-item-card:hover .item-preview-frame img {
+          transform: scale(1.22);
+        }
+
+        .item-info {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
 
         .item-header-row {
           display: flex;
           justify-content: space-between;
-          align-items: center;
+          align-items: flex-start;
+          gap: 8px;
         }
 
-        .item-info h4 { margin: 0; font-size: 13px; font-weight: 600; }
-        .price-tag { margin: 4px 0 6px 0; font-size: 11px; opacity: 0.8; }
+        .item-name {
+          margin: 0;
+          font-size: 12.5px;
+          font-weight: 700;
+          color: #111827;
+          text-transform: capitalize;
+          line-height: 1.3;
+        }
 
-        .color-details-list { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
-        .color-detail-item { display: flex; align-items: center; gap: 4px; font-size: 10px; }
-        .part-name { color: rgba(255, 255, 255, 0.6); }
+        .remove-btn {
+          background: transparent;
+          border: none;
+          color: #9ca3af;
+          cursor: pointer;
+          font-size: 13px;
+          padding: 0 4px;
+          transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        .remove-btn:hover {
+          color: #ef4444;
+          transform: scale(1.15);
+        }
+
+        .price-tag {
+          margin: 0;
+          font-size: 11px;
+          display: flex;
+          align-items: baseline;
+          gap: 6px;
+        }
+
+        .price-label {
+          color: #6b7280;
+          font-size: 10px;
+        }
+
+        .price-amount {
+          color: #80471c;
+          font-size: 13.5px;
+          font-weight: 800;
+        }
+
+        .per-item-note {
+          color: #9ca3af;
+          font-size: 10px;
+        }
+
+        .color-details-list {
+          display: flex;
+          gap: 6px 10px;
+          flex-wrap: wrap;
+          padding: 6px 8px;
+          background: #ffffff;
+          border: 1px solid rgba(0, 0, 0, 0.05);
+          border-radius: 8px;
+        }
+
+        .color-detail-item {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          font-size: 10px;
+        }
+
+        .part-name {
+          color: #6b7280;
+          font-weight: 500;
+        }
 
         .color-dot {
-          width: 10px;
-          height: 10px;
+          width: 9px;
+          height: 9px;
           border-radius: 50%;
-          border: 1px solid rgba(255, 255, 255, 0.5);
+          border: 1px solid rgba(0, 0, 0, 0.15);
           display: inline-block;
+        }
+
+        .color-val-label {
+          color: #111827;
+          font-weight: 600;
         }
 
         .size-select-row {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          margin-bottom: 8px;
-          font-size: 11px;
+          gap: 8px;
         }
 
         .size-left {
@@ -551,13 +632,20 @@ export default function CartDrawer({ isOpen, onClose, currentModel }) {
           gap: 6px;
         }
 
+        .size-label, .qty-label {
+          font-size: 10px;
+          color: #6b7280;
+          font-weight: 600;
+        }
+
         .size-dropdown {
-          background: #333;
-          color: #fff;
-          border: 1px solid rgba(255, 255, 255, 0.2);
+          background: #ffffff;
+          color: #111827;
+          border: 1px solid rgba(0, 0, 0, 0.15);
           border-radius: 6px;
-          padding: 2px 6px;
+          padding: 3px 8px;
           font-size: 11px;
+          font-weight: 600;
           outline: none;
           cursor: pointer;
         }
@@ -565,227 +653,144 @@ export default function CartDrawer({ isOpen, onClose, currentModel }) {
         .size-guide-trigger {
           background: transparent;
           border: none;
-          color: #b56200;
-          font-size: 12px;
-          font-weight: 600;
+          color: #80471c;
+          font-size: 10px;
+          font-weight: 700;
           cursor: pointer;
-          display: flex;
+          display: inline-flex;
           align-items: center;
-          gap: 5px;
+          gap: 4px;
           padding: 0;
+          transition: opacity 0.2s ease;
+        }
+
+        .size-guide-trigger:hover {
+          opacity: 0.8;
           text-decoration: underline;
         }
-        .size-guide-trigger:hover { color: #e98400; }
 
         .qty-control-row {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          font-size: 11px;
-          color: rgba(255, 255, 255, 0.7);
+          margin-top: 2px;
         }
 
         .qty-picker {
-          display: flex;
+          display: inline-flex;
           align-items: center;
-          gap: 6px;
-          background: rgba(255, 255, 255, 0.1);
-          padding: 2px 8px;
-          border-radius: 15px;
+          background: #ffffff;
+          border: 1px solid rgba(0, 0, 0, 0.12);
+          border-radius: 14px;
+          overflow: hidden;
         }
 
         .qty-picker button {
           background: transparent;
           border: none;
-          color: #fff;
-          font-weight: bold;
+          color: #111827;
+          width: 24px;
+          height: 22px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           cursor: pointer;
-          font-size: 13px;
-          padding: 0 4px;
+          font-size: 12px;
+          font-weight: 700;
+          transition: background 0.2s ease;
         }
 
-        .remove-btn {
-          background: transparent;
-          border: none;
-          color: #e98400;
+        .qty-picker button:hover {
+          background: rgba(0, 0, 0, 0.06);
+        }
+
+        .qty-val {
+          padding: 0 6px;
           font-size: 11px;
-          cursor: pointer;
-          padding: 0;
+          font-weight: 700;
+          min-width: 14px;
+          text-align: center;
+          color: #111827;
         }
 
         .cart-footer {
-          border-top: 1px solid rgba(255, 255, 255, 0.15);
-          padding-top: 12px;
+          padding: 20px 24px calc(24px + env(safe-area-inset-bottom, 0px)) 24px;
+          border-top: 1px solid rgba(0, 0, 0, 0.08);
+          background: #fafafa;
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+          flex-shrink: 0;
         }
 
         .total-row {
           display: flex;
           justify-content: space-between;
-          font-size: 14px;
-          margin-bottom: 10px;
+          align-items: flex-end;
         }
 
-        .checkout-btn {
-          width: 100%;
-          background: #e98400;
-          color: #000;
-          border: none;
-          padding: 12px;
-          border-radius: 25px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-
-        .checkout-btn:hover { background: #b96900; color: #fff; }
-
-        .guide-modal-overlay {
-          position: fixed;
-          top: 0; left: 0; right: 0; bottom: 0;
-          background: rgba(0, 0, 0, 0.75);
-          backdrop-filter: blur(4px);
-          z-index: 3000;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          padding: 15px;
-        }
-
-        .guide-modal-content {
-          background: #ffffff;
-          border-radius: 8px;
-          width: 100%;
-          max-width: 440px;
-          max-height: 92vh;
-          overflow-y: auto;
-          color: #222;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-
-        .guide-modal-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 16px 20px;
-          border-bottom: 1px solid #eee;
-        }
-
-        .guide-modal-header h3 {
-          margin: 0;
-          font-size: 18px;
-          font-weight: 700;
-          color: #111;
-        }
-
-        .guide-modal-body {
-          padding: 16px 20px 24px 20px;
-        }
-
-        .custom-size-table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-bottom: 15px;
-        }
-
-        .custom-size-table td {
-          padding: 10px 14px;
-          font-size: 13px;
-          color: #444;
-          text-align: center;
-        }
-
-        .custom-size-table tr:nth-child(odd) {
-          background-color: #f7f7f7;
-        }
-
-        .custom-size-table td:first-child {
-          text-align: center;
-          color: #111;
-        }
-
-        .size-info-box {
-          border: 1px dashed #c4875a;
-          border-radius: 6px;
-          padding: 14px;
-          margin-bottom: 20px;
-          background: #fffdfb;
-        }
-
-        .size-info-box h4 {
-          margin: 0 0 10px 0;
-          font-size: 12px;
+        .total-eyebrow {
+          display: block;
+          font-size: 9.5px;
+          letter-spacing: 1.5px;
+          color: #80471c;
           font-weight: 800;
-          letter-spacing: 0.5px;
-          color: #111;
         }
 
-        .info-section {
-          margin-bottom: 10px;
-        }
-        .info-section:last-child { margin-bottom: 0; }
-
-        .section-title {
-          margin: 0;
-          font-size: 11px;
-          font-weight: 700;
-          color: #a45a27;
-        }
-
-        .section-desc {
-          margin: 2px 0 0 0;
-          font-size: 11px;
-          color: #555;
-          line-height: 1.4;
-        }
-
-        .measurement-guide-container {
-          display: flex;
-          gap: 15px;
-          align-items: flex-start;
-          padding-top: 5px;
-        }
-
-        .guide-illustration {
-          flex-shrink: 0;
-          width: 90px;
-          display: flex;
-          justify-content: center;
-        }
-
-        .guide-steps {
-          flex: 1;
-        }
-
-        .guide-steps h4 {
-          margin: 0 0 10px 0;
+        .total-label {
           font-size: 13px;
+          color: #4b5563;
+          font-weight: 600;
+        }
+
+        .total-price {
+          font-size: 21px;
+          font-weight: 800;
+          color: #80471c;
+        }
+
+        .shipping-perk-badge {
+          font-size: 10.5px;
+          color: #80471c;
+          background: rgba(194, 120, 56, 0.08);
+          border: 1px dashed rgba(194, 120, 56, 0.35);
+          border-radius: 8px;
+          padding: 8px 10px;
+          text-align: center;
+          font-weight: 600;
+        }
+
+        .place-order-btn {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          background: linear-gradient(135deg, #c27838 0%, #8a4816 100%);
+          color: #ffffff;
+          padding: 14px 20px;
+          border-radius: 14px;
+          font-size: 14px;
           font-weight: 700;
-          color: #111;
+          letter-spacing: 0.4px;
+          cursor: pointer;
+          border: none;
+          box-shadow: 0 8px 24px rgba(194, 120, 56, 0.35);
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+          outline: none;
         }
 
-        .step-item {
-          margin-bottom: 10px;
-        }
-        .step-item:last-child { margin-bottom: 0; }
-
-        .step-heading {
-          margin: 0;
-          font-size: 12px;
-          font-weight: 700;
-          color: #111;
-        }
-
-        .step-text {
-          margin: 2px 0 0 0;
-          font-size: 11px;
-          color: #555;
-          line-height: 1.35;
+        .place-order-btn:hover {
+          background: linear-gradient(135deg, #d48744 0%, #99501a 100%);
+          box-shadow: 0 12px 28px rgba(194, 120, 56, 0.45);
+          transform: translateY(-1px);
         }
 
         @media (max-width: 768px) {
-          .cart-modal-overlay { padding: 10px; align-items: flex-end; }
-          .cart-modal-content { width: 100%; max-width: 100%; }
+          .cart-modal-content {
+            width: 100%;
+            max-width: 100%;
+          }
         }
       `}</style>
     </div>

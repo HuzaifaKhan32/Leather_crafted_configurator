@@ -16,18 +16,46 @@ function Loader() {
   return (
     <Html center>
       <div style={{
-        color: '#ffffff',
-        fontSize: '13px',
-        fontWeight: '500',
-        fontFamily: "'Inter', sans-serif",
-        background: 'rgba(0, 0, 0, 0.75)',
-        padding: '8px 16px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '10px',
+        background: 'rgba(255, 255, 255, 0.95)',
+        padding: '16px 24px',
         borderRadius: '20px',
-        backdropFilter: 'blur(10px)',
+        backdropFilter: 'blur(20px)',
+        border: '1px solid rgba(0, 0, 0, 0.08)',
+        boxShadow: '0 16px 40px rgba(0, 0, 0, 0.15)',
         whiteSpace: 'nowrap',
-        letterSpacing: '0.5px'
+        pointerEvents: 'none'
       }}>
-        Loading Model... {displayedProgress.toFixed(0)}%
+        <div style={{
+          fontSize: '10px',
+          fontWeight: '800',
+          letterSpacing: '1.5px',
+          textTransform: 'uppercase',
+          color: '#80471c'
+        }}>
+          Loading 3D Model
+        </div>
+        <div style={{
+          width: '130px',
+          height: '4px',
+          background: 'rgba(0, 0, 0, 0.08)',
+          borderRadius: '4px',
+          overflow: 'hidden'
+        }}>
+          <div style={{
+            width: `${displayedProgress}%`,
+            height: '100%',
+            background: 'linear-gradient(90deg, #c27838, #8a4816)',
+            transition: 'width 0.2s ease',
+            borderRadius: '4px'
+          }} />
+        </div>
+        <span style={{ fontSize: '11px', color: '#111827', fontWeight: '700' }}>
+          {displayedProgress.toFixed(0)}%
+        </span>
       </div>
     </Html>
   );

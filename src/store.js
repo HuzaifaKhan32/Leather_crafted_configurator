@@ -7,9 +7,9 @@ export const state = proxy({
   autoRotate: false,
 
   prices: {
-    "/model/Men’s Genuine Leather Maverick Jacket–Shirt Collar Style.glb": 149.99,
-    "/model/Men’s Real Leather Black 3/4 Length Shearling Style": 215,
-    "/model/Men’s Blue Leather Jacket with Faux Fur Collar.glb": 149.99,
+    "/model/Men’s Genuine Leather Maverick Jacket–Shirt Collar Style.glb": 159.99,
+    "/model/Men’s Real Leather Black 3/4 Length Shearling Style.glb": 215,
+    "/model/Men’s Blue Leather Jacket with Faux Fur Collar.glb": 159.99,
     "/model/Men’s Cognac Brown Real Lambskin Leather Bomber Jacket – Classic Leather Jacket.glb": 159.99,
     "/model/Men’s Black Lambskin Faux Fur Shearling Leather Bomber Jacket.glb": 199.99,
     "/model/Men’s Maroon Lambskin Faux Fur Shearling Leather Bomber Jacket.glb": 199.99,

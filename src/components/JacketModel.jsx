@@ -182,4 +182,4 @@ export function JacketModel() {
   );
 }
 
-useGLTF.preload('/model/jacket_model.glb');
+useGLTF.preload('/model/Men’s Genuine Leather Maverick Jacket–Shirt Collar Style.glb');
