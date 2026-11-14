@@ -188,21 +188,39 @@ export default function CartDrawer({ isOpen, onClose, currentModel, onOpenSizeGu
   const handleProceedToWooCheckout = () => {
     if (snap.cart.length === 0) return;
 
-    const primaryItem = snap.cart[0];
-    const productId = getProductId(primaryItem.modelName);
-    const selectedSize = primaryItem.size || 'M';
+    // Structured items array for multi-item cart endpoints
+    const itemsPayload = snap.cart.map((item, idx) => {
+      const bodyColor = item.colors?.body ? resolveColorName(item.colors.body) : 'N/A';
+      const innerColor = item.colors?.inner ? resolveColorName(item.colors.inner) : 'N/A';
+      const zipColor = item.colors?.zip ? resolveColorName(item.colors.zip) : 'N/A';
+      const selectedSize = item.size || 'M';
+      const pId = getProductId(item.modelName);
 
-    const customDetails = snap.cart
-      .map((item, idx) => {
-        const bodyColor = item.colors?.body ? resolveColorName(item.colors.body) : 'N/A';
-        const innerColor = item.colors?.inner ? resolveColorName(item.colors.inner) : 'N/A';
-        const zipColor = item.colors?.zip ? resolveColorName(item.colors.zip) : 'N/A';
+      return {
+        item_index: idx + 1,
+        product_id: pId,
+        model_name: item.modelName || 'Custom Jacket',
+        quantity: item.quantity || 1,
+        size: selectedSize,
+        price: item.price,
+        body: bodyColor,
+        inner: innerColor,
+        zip: zipColor,
+        custom_jacket: `[Item ${idx + 1}: ${item.modelName || 'Custom Jacket'}] Size: ${selectedSize} | Body: ${bodyColor} | Inner: ${innerColor} | Zip: ${zipColor}`,
+      };
+    });
 
-        return `[Item ${idx + 1}: ${item.modelName || 'Custom Jacket'}] Size: ${item.size || 'M'} | Body: ${bodyColor} | Inner: ${innerColor} | Zip: ${zipColor}`;
-      })
+    const primaryItem = itemsPayload[0];
+
+    const customDetails = itemsPayload
+      .map((item) => item.custom_jacket)
       .join(' || ');
 
-    const customizerEndpoint = `https://leather-crafted.com/wp-json/customizer/v1/add-and-checkout?product_id=${productId}&quantity=${primaryItem.quantity || 1}&size=${encodeURIComponent(selectedSize)}&attribute_pa_size=${encodeURIComponent(selectedSize.toLowerCase())}&variation_size=${encodeURIComponent(selectedSize)}&custom_jacket=${encodeURIComponent(customDetails)}`;
+    const itemsParam = encodeURIComponent(JSON.stringify(itemsPayload));
+    const productIdsParam = encodeURIComponent(itemsPayload.map((it) => it.product_id).join(','));
+    const quantitiesParam = encodeURIComponent(itemsPayload.map((it) => it.quantity).join(','));
+
+    const customizerEndpoint = `https://leather-crafted.com/wp-json/customizer/v1/add-and-checkout?product_id=${primaryItem.product_id}&quantity=${primaryItem.quantity}&size=${encodeURIComponent(primaryItem.size)}&attribute_pa_size=${encodeURIComponent(primaryItem.size.toLowerCase())}&variation_size=${encodeURIComponent(primaryItem.size)}&custom_jacket=${encodeURIComponent(customDetails)}&items=${itemsParam}&product_ids=${productIdsParam}&quantities=${quantitiesParam}`;
 
     window.location.href = customizerEndpoint;
   };

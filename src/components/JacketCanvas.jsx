@@ -7,11 +7,31 @@ import { JacketModel } from './JacketModel.jsx';
 
 function Loader() {
   const { progress } = useProgress();
-  const [displayedProgress, setDisplayedProgress] = useState(0);
+  const [displayedProgress, setDisplayedProgress] = useState(15);
 
+  // Sync with real Drei progress if available and higher
   useEffect(() => {
-    setDisplayedProgress(progress);
+    if (progress > 0) {
+      setDisplayedProgress((prev) => Math.max(prev, progress));
+    }
   }, [progress]);
+
+  // Smooth dynamic progress for single-file model switches where Drei stays at 0%
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDisplayedProgress((prev) => {
+        if (prev < 45) return prev + Math.floor(Math.random() * 8 + 4);
+        if (prev < 75) return prev + Math.floor(Math.random() * 4 + 2);
+        if (prev < 90) return prev + Math.floor(Math.random() * 2 + 1);
+        if (prev < 96) return Math.min(96, prev + 0.3);
+        return prev;
+      });
+    }, 70);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const progressVal = Math.min(100, Math.max(0, displayedProgress)).toFixed(0);
 
   return (
     <Html center>
@@ -46,15 +66,15 @@ function Loader() {
           overflow: 'hidden'
         }}>
           <div style={{
-            width: `${displayedProgress}%`,
+            width: `${progressVal}%`,
             height: '100%',
             background: 'linear-gradient(90deg, #c27838, #8a4816)',
-            transition: 'width 0.2s ease',
+            transition: 'width 0.15s ease-out',
             borderRadius: '4px'
           }} />
         </div>
         <span style={{ fontSize: '11px', color: '#111827', fontWeight: '700' }}>
-          {displayedProgress.toFixed(0)}%
+          {progressVal}%
         </span>
       </div>
     </Html>

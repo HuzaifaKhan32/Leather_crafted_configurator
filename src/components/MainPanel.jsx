@@ -32,22 +32,22 @@ export default function MainPanel({ activeCategory, onClose }) {
   ];
 
   const manStyles = [
-    { name: "Maverick Collar", img: "/man-thumbnail/burgundy_leather_jacket.jpg", path: "/model/Men’s Genuine Leather Maverick Jacket–Shirt Collar Style.glb" },
-    { name: "3/4 Shearling Coat", img: "/man-thumbnail/man_leather_shearling_coat.jpg", path: "/model/Men’s Real Leather Black 3/4 Length Shearling Style.glb" },
-    { name: "Faux Fur Collar", img: "/man-thumbnail/tan_leather_jacket.JPG", path: "/model/Men’s Blue Leather Jacket with Faux Fur Collar.glb" },
+    { name: "Maverick Collar", img: "/man-thumbnail/burgundy_leather_jacket.png", path: "/model/Men’s Genuine Leather Maverick Jacket–Shirt Collar Style.glb" },
+    { name: "3/4 Shearling Coat", img: "/man-thumbnail/man_leather_shearling_coat.png", path: "/model/Men’s Real Leather Black 3/4 Length Shearling Style.glb" },
+    { name: "Faux Fur Collar", img: "/man-thumbnail/tan_leather_jacket.png", path: "/model/Men’s Blue Leather Jacket with Faux Fur Collar.glb" },
     { name: "Brown Classic Bomber", img: "/man-thumbnail/brown_trucker.png", path: "/model/Men’s Cognac Brown Real Lambskin Leather Bomber Jacket – Classic Leather Jacket.glb" },
-    { name: "Black Aviator Shearling", img: "/man-thumbnail/Leather_Shearling.jpg", path: "/model/Men’s Black Lambskin Faux Fur Shearling Leather Bomber Jacket.glb" },
-    { name: "Maroon Fur Bomber", img: "/man-thumbnail/Real_Leather.jpg", path: "/model/Men’s Maroon Lambskin Faux Fur Shearling Leather Bomber Jacket.glb" },
+    { name: "Black Aviator Shearling", img: "/man-thumbnail/Leather_Shearling.png", path: "/model/Men’s Black Lambskin Faux Fur Shearling Leather Bomber Jacket.glb" },
+    { name: "Maroon Fur Bomber", img: "/man-thumbnail/Real_Leather.png", path: "/model/Men’s Maroon Lambskin Faux Fur Shearling Leather Bomber Jacket.glb" },
     { name: "Classic Zip Bomber", img: "/man-thumbnail/Zipper_Bomber_Jacket.png", path: "/model/Men’s  Real Lambskin Leather Bomber Jacket – Classic Zip-Up Leather Jacket.glb" }
   ];
 
   const womenStyles = [
-    { name: "B3 Cream Shearling", img: "/women-thumbnail/Women_Black_Shearling.JPG", path: "/model/Women’s Black Real Leather B3 Bomber Cream Shearling Jacket.glb" }, 
-    { name: "Cropped Trucker", img: "/women-thumbnail/women_cropped_jacket.jpg", path: "/model/Women’s Cognac Cropped Genuine Lambskin Leather Trucker Jacket.glb" }, 
+    { name: "B3 Cream Shearling", img: "/women-thumbnail/Women_Black_Shearling.png", path: "/model/Women’s Black Real Leather B3 Bomber Cream Shearling Jacket.glb" }, 
+    { name: "Cropped Trucker", img: "/women-thumbnail/women_cropped_jacket.png", path: "/model/Women’s Cognac Cropped Genuine Lambskin Leather Trucker Jacket.glb" }, 
     { name: "Ribbed Leather Bomber", img: "/women-thumbnail/Bomber_jacket_ribbed.png", path: "/model/Women’s Cognac Brown Genuine Lambskin Leather Bomber Jacket.glb" },
-    { name: "3/4 Shearling Coat", img: "/women-thumbnail/maroon_jacket.jpg", path: "/model/Women’s Black Genuine Lambskin Leather 3/4 Length Coat Faux Fur Shearling.glb" },
+    { name: "3/4 Shearling Coat", img: "/women-thumbnail/maroon_jacket.png", path: "/model/Women’s Black Genuine Lambskin Leather 3/4 Length Coat Faux Fur Shearling.glb" },
     { name: "Blue Classic Bomber", img: "/women-thumbnail/Women_Blue_Leather.png", path: "/model/Women’s Blue Real Lambskin Leather Bomber Jacket – Classic Zip-Up Leather Jacket.glb" },
-    { name: "Hooded Aviator Shearling", img: "/women-thumbnail/hoddy.jpg", path: "/model/Women’s Hooded Black Real Lambskin Leather Faux Shearling Aviator Jacket.glb" }
+    { name: "Hooded Aviator Shearling", img: "/women-thumbnail/hoddy.png", path: "/model/Women’s Hooded Black Real Lambskin Leather Faux Shearling Aviator Jacket.glb" }
   ];
 
   const currentColors = activePart === "inner" ? shearlingColors : bodyColors;
