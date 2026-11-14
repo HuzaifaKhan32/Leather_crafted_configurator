@@ -107,13 +107,13 @@ export default function App() {
       />
 
       {/* Navigation Panels */}
-      {!activeTab ? (
-        <Sidebar 
-          activeTab={activeTab} 
-          setActiveTab={setActiveTab} 
-          onSelectModel={(model) => setCurrentModel(model)}
-        />
-      ) : (
+      <Sidebar 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+        onSelectModel={(model) => setCurrentModel(model)}
+      />
+
+      {activeTab && (
         <MainPanel 
           activeCategory={activeTab} 
           onClose={() => setActiveTab(null)} 

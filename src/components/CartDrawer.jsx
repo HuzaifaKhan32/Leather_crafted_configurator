@@ -222,7 +222,10 @@ export default function CartDrawer({ isOpen, onClose, currentModel, onOpenSizeGu
 
     const customizerEndpoint = `https://leather-crafted.com/wp-json/customizer/v1/add-and-checkout?product_id=${primaryItem.product_id}&quantity=${primaryItem.quantity}&size=${encodeURIComponent(primaryItem.size)}&attribute_pa_size=${encodeURIComponent(primaryItem.size.toLowerCase())}&variation_size=${encodeURIComponent(primaryItem.size)}&custom_jacket=${encodeURIComponent(customDetails)}&items=${itemsParam}&product_ids=${productIdsParam}&quantities=${quantitiesParam}`;
 
-    window.location.href = customizerEndpoint;
+    const newTab = window.open(customizerEndpoint, '_blank');
+    if (!newTab || newTab.closed || typeof newTab.closed === 'undefined') {
+      window.location.href = customizerEndpoint;
+    }
   };
 
   const totalPrice = Number(snap.cart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0).toFixed(2));
